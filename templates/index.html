@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transportation Network Optimizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function addStationField() {
+            const container = document.getElementById('station-coordinates');
+            const newRow = document.createElement('div');
+            newRow.className = 'station-row';
+            newRow.innerHTML = `
+                <input type="number" name="station_x" placeholder="X Coordinate" step="0.1" required>
+                <input type="number" name="station_y" placeholder="Y Coordinate" step="0.1" required>
+                <button type="button" onclick="this.parentNode.remove()">Remove</button>
+            `;
+            container.appendChild(newRow);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Transportation Network Optimizer</h1>
+
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="num_buses">Number of Buses:</label>
+                <input type="number" id="num_buses" name="num_buses" min="1" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="bus_speed">Bus Speed (km/h):</label>
+                <input type="number" id="bus_speed" name="bus_speed" min="10" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Station Coordinates (km):</label>
+                <div id="station-coordinates">
+                    <div class="station-row">
+                        <input type="number" name="station_x" placeholder="X Coordinate" step="0.1" required>
+                        <input type="number" name="station_y" placeholder="Y Coordinate" step="0.1" required>
+                    </div>
+                </div>
+                <button type="button" onclick="addStationField()">Add Station</button>
+            </div>
+
+            <div class="form-group">
+                <label> Algorithm params:</label>
+                <div class="algorithm-params">
+                    <div class="algorithm-row-labels">
+                        <label for="population_size">Population size:</label>
+                        <label for="num_generations">Number of generations:</label>
+                        <label for="mutation_rate">Mutation rate:</label>
+                    </div>
+                    <div class = "algorithm-row">
+                        <input type="number" name="population_size" placeholder="Population size" step="0.1" value='1000' required>
+                        <input type="number" name="num_generations" placeholder="Number of generations" step="0.1" value='100' required>
+                        <input type="number" name="mutation_rate" placeholder="Mutation rate" step="0.1" value='0.1' required>
+                    </div>
+                </div>
+            
+            <button type="submit">Optimize timetable to reduce waiting time</button>
+        </form>
+        
+        <div class="timetable-container">
+            <h2>Bus Schedule</h2>
+            {% if bus_routes %}
+                {% for route in bus_routes %}
+                <div class="bus-route" style="background: hsl({{ route.bus_number * 40 }}, 70%, 95%)">
+                    <div class="bus-number">Bus {{ route.bus_number }}</div>
+                    <div class="times">
+                        {% for time in route.departure_times %}
+                            <span class="time-slot">
+                                Station {{ loop.index }}: {{ time }}min
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No schedule available</p>
+            {% endif %}
+        </div>
+</body>
+</html>
